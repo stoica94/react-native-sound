@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-var ReactNative = require('react-native');
+var ReactNative = require("react-native");
 var RNSound = ReactNative.NativeModules.RNSound;
 var IsAndroid = RNSound.IsAndroid;
 var IsWindows = RNSound.IsWindows;
@@ -19,36 +19,35 @@ function Sound(filename, basePath, onError, options) {
     this._filename = asset.uri;
     onError = basePath;
   } else {
-    this._filename = basePath ? basePath + '/' + filename : filename;
+    this._filename = basePath ? basePath + "/" + filename : filename;
 
     if (IsAndroid && !basePath && isRelativePath(filename)) {
-      this._filename = filename.toLowerCase().replace(/\.[^.]+$/, '');
+      this._filename = filename.toLowerCase().replace(/\.[^.]+$/, "");
     }
   }
 
   this.registerOnPlay = function() {
     if (this.onPlaySubscription != null) {
-      console.warn('On Play change event listener is already registered');
+      console.warn("On Play change event listener is already registered");
       return;
     }
 
     if (!IsWindows) {
       this.onPlaySubscription = eventEmitter.addListener(
-        'onPlayChange',
-        (param) => {
+        "onPlayChange",
+        param => {
           const { isPlaying, playerKey } = param;
           if (playerKey === this._key) {
             if (isPlaying) {
               this._playing = true;
-            }
-            else {
+            } else {
               this._playing = false;
             }
           }
-        },
+        }
       );
     }
-  }
+  };
 
   this._loaded = false;
   this._key = nextKey++;
@@ -61,10 +60,10 @@ function Sound(filename, basePath, onError, options) {
   this._speed = 1;
   RNSound.prepare(this._filename, this._key, options || {}, (error, props) => {
     if (props) {
-      if (typeof props.duration === 'number') {
+      if (typeof props.duration === "number") {
         this._duration = props.duration;
       }
-      if (typeof props.numberOfChannels === 'number') {
+      if (typeof props.numberOfChannels === "number") {
         this._numberOfChannels = props.numberOfChannels;
       }
     }
@@ -82,7 +81,7 @@ Sound.prototype.isLoaded = function() {
 
 Sound.prototype.play = function(onEnd) {
   if (this._loaded) {
-    RNSound.play(this._key, (successfully) => onEnd && onEnd(successfully));
+    RNSound.play(this._key, successfully => onEnd && onEnd(successfully));
   } else {
     onEnd && onEnd(false);
   }
@@ -156,8 +155,15 @@ Sound.prototype.setVolume = function(value) {
 };
 
 Sound.prototype.getSystemVolume = function(callback) {
-  if(!IsWindows) {
+  if (!IsWindows) {
     RNSound.getSystemVolume(callback);
+  }
+  return this;
+};
+
+Sound.prototype.getSilentStatus = function(callback) {
+  if (IsAndroid) {
+    RNSound.getSilentStatus(callback);
   }
   return this;
 };
@@ -175,7 +181,7 @@ Sound.prototype.getPan = function() {
 
 Sound.prototype.setPan = function(value) {
   if (this._loaded) {
-    RNSound.setPan(this._key, this._pan = value);
+    RNSound.setPan(this._key, (this._pan = value));
   }
   return this;
 };
@@ -232,11 +238,11 @@ Sound.prototype.setSpeakerphoneOn = function(value) {
 
 Sound.prototype.setCategory = function(value) {
   Sound.setCategory(value, false);
-}
+};
 
 Sound.prototype.isPlaying = function() {
   return this._playing;
-}
+};
 
 Sound.enable = function(enabled) {
   RNSound.enable(enabled);
@@ -268,9 +274,9 @@ Sound.setMode = function(value) {
 
 Sound.setSpeakerPhone = function(value) {
   if (!IsAndroid && !IsWindows) {
-    RNSound.setSpeakerPhone(value)
+    RNSound.setSpeakerPhone(value);
   }
-}
+};
 
 Sound.MAIN_BUNDLE = RNSound.MainBundlePath;
 Sound.DOCUMENT = RNSound.NSDocumentDirectory;

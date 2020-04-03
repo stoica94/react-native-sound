@@ -153,6 +153,33 @@ public class RNSoundModule extends ReactContextBaseJavaModule implements AudioMa
     }
   }
 
+  @ReactMethod
+  public void getSilentStatus(final Callback callback) {
+    try {
+      AudioManager audioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+
+      switch (am.getRingerMode()) {
+        case AudioManager.RINGER_MODE_SILENT:
+          callback.invoke("silent");
+          Log.i("MyApp","Silent mode");
+          break;
+        case AudioManager.RINGER_MODE_VIBRATE:
+          callback.invoke("vibrate");
+          Log.i("MyApp","Vibrate mode");
+          break;
+        case AudioManager.RINGER_MODE_NORMAL:
+          callback.invoke("normal");
+          Log.i("MyApp","Normal mode");
+          break;
+      }
+    } catch (Exception error) {
+      WritableMap e = Arguments.createMap();
+      e.putInt("code", -1);
+      e.putString("message", error.getMessage());
+      callback.invoke(e);
+    }
+  }
+
   protected MediaPlayer createMediaPlayer(final String fileName) {
     int res = this.context.getResources().getIdentifier(fileName, "raw", this.context.getPackageName());
     MediaPlayer mediaPlayer = new MediaPlayer();
